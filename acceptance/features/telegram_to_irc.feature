@@ -43,6 +43,16 @@ Feature: relaying Telegram to IRC
             | / psst   |
             | /c psst  |
 
+    Scenario: every line of a multi-line message names the sender the same way
+        Given "bob16" is in the IRC channel "#bridge-one"
+        When the user sends these lines
+            """
+            first line
+            second line
+            third line
+            """
+        Then "bob16" sees the bridge write "tester" in bold on all 3 lines in "#bridge-one"
+
     Scenario: long messages are cut short
         Given "bob6" is in the IRC channel "#bridge-one"
         When the user sends these lines
