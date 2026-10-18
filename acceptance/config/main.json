@@ -69,6 +69,20 @@
                         "channels": {
                             "#copy-dst": {}
                         }
+                    },
+                    "netc": {
+                        "host": "ircd",
+                        "nick": "noctoc",
+                        "options": {
+                            "userName": "noctoc",
+                            "realName": "Nocto rename bridge",
+                            "port": 6667,
+                            "floodProtection": false,
+                            "retryDelay": 1000
+                        },
+                        "channels": {
+                            "#renames": {"relayTo": [-4108]}
+                        }
                     }
                 }
             }

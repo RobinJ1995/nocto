@@ -57,7 +57,7 @@ def before_feature(context: Context, feature: Feature) -> None:
     context.chanop = IrcClient("chanop", "Channel Operator")
     context.chanop.oper()
     for chan in ("#bridge-one", "#bridge-two", "#bridge-shared", "#multi-a", "#multi-b",
-                 "#readonly", "#copy-src", "#copy-dst"):
+                 "#readonly", "#copy-src", "#copy-dst", "#renames"):
         _join_with_bridge(context.chanop, chan)
         context.chanop.send(f"SAMODE {chan} +o chanop")
     time.sleep(1)

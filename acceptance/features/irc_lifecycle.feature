@@ -9,3 +9,8 @@ Feature: restarting the bridge
     Then group -4101 receives "I am now attached to channel #bridge-one"
     When "gina1" says "still there?" in "#bridge-one"
     Then group -4101 receives "<gina1@#bridge-one> still there?"
+
+  Scenario: the bridge doesn't announce its own nick changes
+    Given a group chat with id -4108
+    When an IRC operator renames "noctoc" to "noctoc_renamed"
+    Then group -4108 receives nothing containing "is now known as"
