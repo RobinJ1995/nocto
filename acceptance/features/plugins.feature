@@ -21,6 +21,11 @@ Feature: plugin control
       | /plugin list     |
       | /PLUGINS STATUS  |
 
+  Scenario: the status is the default operation
+    Given user 2307 is a trusted user
+    When user 2307 sends "/plugins"
+    Then the bot reply matches "Ld/En/Name(\n(✔️|❌){2} \w+)+"
+
   Scenario Outline: the status shows what is loaded and enabled (<plugin>)
     Then the plugin status lists "<plugin>" as <state>
 
