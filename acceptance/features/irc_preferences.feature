@@ -25,6 +25,11 @@ Feature: IRC preferences
       | way_too_long_for_an_irc_nick_ok |
       | héhé                            |
 
+  Scenario: no alias given
+    Given a user with id 4514 and first name "Tester"
+    When the user sends "/setalias"
+    Then the bot replies "Not a valid IRC nickname."
+
   Scenario: listing the available colours
     Given a user with id 4503 and first name "Tester"
     When the user sends "/setcolor"
