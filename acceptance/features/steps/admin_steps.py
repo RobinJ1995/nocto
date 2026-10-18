@@ -2,7 +2,7 @@
 import time
 from typing import Dict
 
-from behave import given, then, use_step_matcher
+from behave import given, then, when, use_step_matcher
 from behave.runner import Context
 
 import helpers
@@ -54,6 +54,13 @@ def step_toggle_plugin(context: Context, operation: str, plugin: str) -> None:
     verb = operation[:-1]
     owner_command(context, f"/plugins {verb} {plugin}", "")
     context.plugin_toggles.append((context.bot, plugin, "disable" if verb == "enable" else "enable"))
+
+
+@when(r'the owner disables and re-enables the "(?P<plugin>[^"]*)" plugin')
+def step_reenable_plugin(context: Context, plugin: str) -> None:
+    context.cursor = helpers.last_seq(context.bot)
+    owner_command(context, f"/plugins disable {plugin}", f"\u2714\ufe0f Disable {plugin}")
+    owner_command(context, f"/plugins enable {plugin}", f"\u2714\ufe0f Enable {plugin}")
 
 
 def plugin_status(context: Context) -> Dict[str, tuple]:
