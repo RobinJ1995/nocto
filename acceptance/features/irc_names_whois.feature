@@ -12,6 +12,12 @@ Feature: looking at IRC from Telegram
     Then the bot reply contains "Other users in channel #bridge-one: "
     And the bot's last reply lists "carol1" and "chanop" but not "nocto"
 
+  Scenario: the channel defaults to the group's only one
+    Given "carol3" is in the IRC channel "#bridge-one"
+    When the user sends "/names"
+    Then the bot reply contains "Other users in channel #bridge-one: "
+    And the bot's last reply lists "carol3" and "chanop" but not "nocto"
+
   Scenario: only channels bridged to this group
     When the user sends "/names #bridge-two"
     Then the bot replies "Channel #bridge-two is not associated with this group."
@@ -30,6 +36,11 @@ Feature: looking at IRC from Telegram
     When the user sends "/whois #bridge-one carol2"
     Then the bot reply contains ""realname": "Carol2 Realname""
     And the bot replies in Markdown
+
+  Scenario: looking up a user in the group's only channel
+    Given "carol4" is in the IRC channel "#bridge-one"
+    When the user sends "/whois carol4"
+    Then the bot reply contains ""realname": "Carol4 Realname""
 
   Scenario: looking up someone who isn't there
     When the user sends "/whois #bridge-one ghost"
