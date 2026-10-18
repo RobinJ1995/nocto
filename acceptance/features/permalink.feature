@@ -80,6 +80,13 @@ Feature: media permalinks
     Then the download contains the file "pl-cached"
     And the bot looked up the file "pl-cached" 1 time(s)
 
+  Scenario: Telegram drops the download
+    Given Telegram drops the connection when the file "pl-dropped" is downloaded
+    When the user sends a photo "pl-dropped"
+    And the user sends "/permalink"
+    And the permalink is downloaded
+    Then the download fails with status 502
+
   Scenario: a file Telegram doesn't know
     When "/media/pl-missing.jpg" is downloaded from the bot
     Then the download fails

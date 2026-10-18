@@ -99,6 +99,11 @@ def step_file_contains(context: Context, file_id: str, content: str) -> None:
     context.files[file_id] = content.encode()
 
 
+@given(r'Telegram drops the connection when the file "(?P<file_id>[^"]*)" is downloaded')
+def step_file_drops(context: Context, file_id: str) -> None:
+    helpers.register_file(file_id, b"never arrives", drop=True)
+
+
 # ---------------------------------------------------------------------------
 # When: sending messages
 # ---------------------------------------------------------------------------
