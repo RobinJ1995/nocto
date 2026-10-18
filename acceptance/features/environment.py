@@ -3,11 +3,12 @@ import sys
 import time
 
 import requests
-from behave.model import Scenario
+from behave.model import Feature, Scenario
 from behave.runner import Context
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "steps"))
 import helpers  # noqa: E402
+from irc_client import IrcClient  # noqa: E402
 
 STARTUP_TIMEOUT = 120
 
@@ -49,6 +50,38 @@ def before_all(context: Context) -> None:
     helpers.reset_mocks()
 
 
+def before_feature(context: Context, feature: Feature) -> None:
+    if "irc" not in feature.tags:
+        return
+    # A channel operator for kicks, topics and modes. Joining also proves the bridge is in place.
+    context.chanop = IrcClient("chanop", "Channel Operator")
+    context.chanop.oper()
+    for chan in ("#bridge-one", "#bridge-two", "#bridge-shared", "#multi-a", "#multi-b",
+                 "#readonly", "#copy-src", "#copy-dst"):
+        _join_with_bridge(context.chanop, chan)
+        context.chanop.send(f"SAMODE {chan} +o chanop")
+    time.sleep(1)
+
+
+def _join_with_bridge(client: IrcClient, chan: str) -> None:
+    deadline = time.time() + STARTUP_TIMEOUT
+    while time.time() < deadline:
+        since = client.mark()
+        client.join(chan)
+        names = " ".join(l.text for l in client.find(lambda l: l.command == "353", since))
+        if any(nick.lstrip("@+").startswith("nocto") for nick in names.split()):
+            return
+        client.send(f"PART {chan}")
+        time.sleep(1)
+    raise RuntimeError(f"The bridge never joined {chan}")
+
+
+def after_feature(context: Context, feature: Feature) -> None:
+    if "irc" in feature.tags:
+        context.chanop.quit()
+        time.sleep(1)
+
+
 def before_scenario(context: Context, scenario: Scenario) -> None:
     helpers.reset_mocks()
     tags = set(scenario.effective_tags)
@@ -59,8 +92,14 @@ def before_scenario(context: Context, scenario: Scenario) -> None:
     context.sent = []
     context.last_reply = None
     context.plugin_toggles = []
+    context.irc = {}
 
 
 def after_scenario(context: Context, scenario: Scenario) -> None:
+    for irc in context.irc.values():
+        irc.quit()
+    if context.irc:
+        # Let the bridge relay the quits before the next scenario resets the mocks.
+        time.sleep(1.5)
     for bot, plugin, operation in reversed(context.plugin_toggles):
         helpers.converse(bot, helpers.OWNER, helpers.OWNER["id"], f"/plugins {operation} {plugin}")
