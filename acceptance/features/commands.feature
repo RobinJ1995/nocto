@@ -23,6 +23,14 @@ Feature: command handling
         When the user sends "/echo@nocto_main_bot addressed"
         Then the bot replies "addressed"
 
+    Scenario: a command addressed to another bot is ignored
+        When the user sends "/echo@some_other_bot not for you"
+        Then the bot sends no reply
+
+    Scenario: the bot's username is matched case-insensitively
+        When the user sends "/echo@Nocto_Main_Bot shouting"
+        Then the bot replies "shouting"
+
     Scenario: an unknown command is ignored
         When the user sends "/frobnicate now"
         Then the bot sends no reply
