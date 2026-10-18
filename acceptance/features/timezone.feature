@@ -56,3 +56,14 @@ Feature: timezone plugin
             | constructor    |
             | __proto__      |
             | hasOwnProperty |
+
+    # Half-hour and three-quarter offsets put single-digit minutes somewhere for half of every hour.
+    Scenario Outline: the time is shown with zero-padded minutes (<zone>)
+        When the user sends "/tz <zone>"
+        Then the bot replies with the current time in <zone>
+
+        Examples:
+            | zone           |
+            | UTC            |
+            | Asia/Kolkata   |
+            | Asia/Kathmandu |
