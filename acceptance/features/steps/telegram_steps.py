@@ -3,8 +3,10 @@
 Uses the regex matcher (anchored at both ends) so generic steps such as
 'the user sends "..."' can't swallow their more specific variants.
 """
+import datetime
 import re
 import time
+import zoneinfo
 from typing import Any, Dict, List, Optional
 
 from behave import given, then, when, use_step_matcher
@@ -204,6 +206,18 @@ def step_replies_immediately(context: Context, expected: str) -> None:
 def step_replies_text(context: Context) -> None:
     actual = reply_text(context)
     assert actual == context.text, f"Expected reply {context.text!r} but got {actual!r}"
+
+
+def _clock(moment: datetime.datetime) -> str:
+    return f"{moment.hour % 12 or 12}:{moment.minute:02d}{'am' if moment.hour < 12 else 'pm'}"
+
+
+@then(r'the bot replies with the current time in (?P<zone>\S+)')
+def step_replies_current_time(context: Context, zone: str) -> None:
+    actual = reply_text(context)
+    now = datetime.datetime.now(zoneinfo.ZoneInfo(zone))
+    expected = [f"{zone}: {_clock(now - datetime.timedelta(minutes=delta))}" for delta in (0, 1)]
+    assert actual in expected, f"Expected one of {expected!r}, got {actual!r}"
 
 
 @then(r'the bot reply contains "(?P<expected>.*)"')
