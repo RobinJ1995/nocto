@@ -62,8 +62,8 @@ function fetchSuggestions(query, language) {
             if (error || response.statusCode !== 200) {
                 reject({
                     error: error || undefined,
-                    status: response.status || undefined,
-                    headers: response.headers || undefined
+                    status: response ? response.statusCode : undefined,
+                    headers: response ? response.headers : undefined
                 });
                 return;
             }
