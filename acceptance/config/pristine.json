@@ -1,0 +1,33 @@
+{
+    "api": {
+        "token": "1003:pristine",
+        "baseUri": "https://telegram-mock:8443",
+        "pollTimeout": 5,
+        "pollRetry": 1000
+    },
+    "plugins": {
+        "loadAll": false,
+        "register": ["echo"],
+        "autoEnabled": ["echo"]
+    },
+    "services": {
+        "config": {
+            "firewall": {
+                "rules": {
+                    "privateCommand": "trusted",
+                    "groupCommand": "user",
+                    "privateMessage": "user",
+                    "groupMessage": "user"
+                }
+            }
+        }
+    },
+    "log": {
+        "appenders": {
+            "console": {"type": "console", "layout": {"type": "basic"}}
+        },
+        "categories": {
+            "default": {"appenders": ["console"], "level": "INFO"}
+        }
+    }
+}
