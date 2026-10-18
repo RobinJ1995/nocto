@@ -1,8 +1,11 @@
 """Stand-in for the third-party HTTP services nocto plugins talk to."""
+import datetime
+import email.utils
+import hashlib
 import logging
 import threading
 from typing import Any, Dict, List
-from xml.sax.saxutils import quoteattr
+from xml.sax.saxutils import escape, quoteattr
 
 from flask import Flask, Response, jsonify, request
 
@@ -13,6 +16,7 @@ lock = threading.Lock()
 
 suggestions: Dict[str, Dict[str, Any]] = {}
 suggest_requests: List[Dict[str, Any]] = []
+feeds: Dict[str, Dict[str, Any]] = {}
 
 
 def log_request(target: List[Dict[str, Any]]) -> None:
@@ -54,11 +58,80 @@ def get_suggest_requests() -> Response:
     return jsonify({"requests": result})
 
 
+def new_feed(name: str) -> Dict[str, Any]:
+    return {"title": name, "entries": [], "status": 200, "etag": False, "last_modified": False,
+            "changed": datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0),
+            "requests": []}
+
+
+def render_feed(name: str, feed: Dict[str, Any]) -> str:
+    def entry(e: Dict[str, Any]) -> str:
+        author = f"<author><name>{escape(e['author'])}</name></author>" if e.get("author") else ""
+        return (f"<entry><id>urn:{escape(name)}:{escape(e['title'])}</id><title>{escape(e['title'])}</title>"
+                f"<link href={quoteattr(e['link'])}/><published>{e['published']}</published>"
+                f"<updated>{e['published']}</updated>{author}</entry>")
+    entries = "".join(entry(e) for e in reversed(feed["entries"]))
+    return (f'<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom">'
+            f"<id>urn:{escape(name)}</id><title>{escape(feed['title'])}</title>"
+            f"<updated>{feed['changed'].isoformat()}</updated>{entries}</feed>")
+
+
+@app.route("/feeds/<name>.xml")
+def serve_feed(name: str) -> Response:
+    with lock:
+        feed = feeds.get(name)
+        if feed is None:
+            return Response("Not Found", status=404)
+        feed["requests"].append({"headers": dict(request.headers)})
+        if feed["status"] != 200:
+            return Response("error", status=feed["status"])
+        body = render_feed(name, feed)
+        headers = {}
+        if feed["etag"]:
+            headers["ETag"] = '"' + hashlib.sha1(body.encode()).hexdigest() + '"'
+            if request.headers.get("If-None-Match") == headers["ETag"]:
+                return Response(status=304, headers=headers)
+        if feed["last_modified"]:
+            headers["Last-Modified"] = email.utils.format_datetime(feed["changed"], usegmt=True)
+            since = request.headers.get("If-Modified-Since")
+            if since and email.utils.parsedate_to_datetime(since) >= feed["changed"]:
+                return Response(status=304, headers=headers)
+    return Response(body, mimetype="application/atom+xml", headers=headers)
+
+
+@app.route("/test/feeds/<name>", methods=["PUT"])
+def configure_feed(name: str) -> Response:
+    body = request.get_json(force=True)
+    with lock:
+        feed = feeds.setdefault(name, new_feed(name))
+        feed.update({k: v for k, v in body.items() if k in ("title", "status", "etag", "last_modified")})
+    return jsonify({"ok": True})
+
+
+@app.route("/test/feeds/<name>/entries", methods=["POST"])
+def publish_entries(name: str) -> Response:
+    with lock:
+        feed = feeds.setdefault(name, new_feed(name))
+        for item in request.get_json(force=True):
+            # Strictly increasing timestamps: the bot only announces entries newer than the last one it saw.
+            now = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0)
+            feed["changed"] = max(now, feed["changed"] + datetime.timedelta(seconds=1))
+            feed["entries"].append(dict(item, published=feed["changed"].isoformat()))
+    return jsonify({"ok": True})
+
+
+@app.route("/test/feeds/<name>/requests")
+def feed_requests(name: str) -> Response:
+    with lock:
+        return jsonify({"requests": list(feeds.get(name, {}).get("requests", []))})
+
+
 @app.route("/test/reset", methods=["POST"])
 def reset() -> Response:
     with lock:
         suggestions.clear()
         suggest_requests.clear()
+        feeds.clear()
     return jsonify({"ok": True})
 
 
