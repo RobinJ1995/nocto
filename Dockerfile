@@ -1,5 +1,9 @@
 FROM node:24
 
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends webp \
+ && rm -rf /var/lib/apt/lists/*
+
 COPY . /usr/src/app
 
 WORKDIR /usr/src/app

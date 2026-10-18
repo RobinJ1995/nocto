@@ -4,6 +4,7 @@ Uses the regex matcher (anchored at both ends) so generic steps such as
 'the user sends "..."' can't swallow their more specific variants.
 """
 import datetime
+import os
 import re
 import time
 import zoneinfo
@@ -15,6 +16,10 @@ from behave.runner import Context
 import helpers
 
 use_step_matcher("re")
+
+FIXTURES = os.path.join(os.path.dirname(__file__), "..", "fixtures")
+MAGIC = {"WebP": lambda m: m.startswith("52494646") and m[16:24] == "57454250",
+         "PNG": lambda m: m.startswith("89504e47")}
 
 
 def _user(user_id: str, first_name: Optional[str] = None, username: Optional[str] = None) -> Dict[str, Any]:
@@ -97,6 +102,12 @@ def step_file_contains(context: Context, file_id: str, content: str) -> None:
     helpers.register_file(file_id, content.encode())
     context.files = getattr(context, "files", {})
     context.files[file_id] = content.encode()
+
+
+@given(r'the file "(?P<file_id>[^"]*)" is the image "(?P<fixture>[^"]*)"')
+def step_file_is_image(context: Context, file_id: str, fixture: str) -> None:
+    with open(os.path.join(FIXTURES, fixture), "rb") as fh:
+        helpers.register_file(file_id, fh.read())
 
 
 @given(r'Telegram drops the connection when the file "(?P<file_id>[^"]*)" is downloaded')
@@ -313,6 +324,25 @@ def step_told_privately_once(context: Context, user_id: str, expected: str) -> N
     assert helpers.wait_until(matching), f"User {user_id} was never told {expected!r}"
     helpers.settle(context.bot, context.sent)
     assert len(matching()) == 1, f"User {user_id} was told {expected!r} {len(matching())} times"
+
+
+def _upload(context: Context, method: str) -> Dict[str, Any]:
+    call = helpers.wait_for_reply(context.bot, context.reply_chat, context.cursor, (method,))
+    assert call, f"Expected the bot to call {method}"
+    return call
+
+
+@then(r"the bot sends a sticker in (?P<kind>WebP) format")
+def step_sends_sticker(context: Context, kind: str) -> None:
+    upload = _upload(context, "sendSticker")["files"]["sticker"]
+    assert MAGIC[kind](upload["magic"]), f"The sticker is not {kind}: {upload!r}"
+
+
+@then(r'the bot sends the document "(?P<name>[^"]*)" in (?P<kind>PNG) format')
+def step_sends_document(context: Context, name: str, kind: str) -> None:
+    upload = _upload(context, "sendDocument")["files"]["document"]
+    assert upload["filename"] == name, f"Expected {name!r}, got {upload['filename']!r}"
+    assert MAGIC[kind](upload["magic"]), f"The document is not {kind}: {upload!r}"
 
 
 # ---------------------------------------------------------------------------
