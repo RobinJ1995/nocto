@@ -182,3 +182,23 @@ def suggest_requests(query: str) -> List[Dict[str, Any]]:
     resp = requests.get(f"{HTTP_MOCK_URL}/test/suggest/requests", params={"q": query}, timeout=5)
     resp.raise_for_status()
     return resp.json()["requests"]
+
+
+def configure_feed(name: str, **settings: Any) -> None:
+    requests.put(f"{HTTP_MOCK_URL}/test/feeds/{name}", json=settings, timeout=5).raise_for_status()
+
+
+def publish_entries(name: str, entries: List[Dict[str, Any]]) -> None:
+    requests.post(f"{HTTP_MOCK_URL}/test/feeds/{name}/entries", json=entries, timeout=5).raise_for_status()
+
+
+def feed_requests(name: str) -> List[Dict[str, Any]]:
+    resp = requests.get(f"{HTTP_MOCK_URL}/test/feeds/{name}/requests", timeout=5)
+    resp.raise_for_status()
+    return resp.json()["requests"]
+
+
+def wait_feed_checked(name: str, times: int = 1, timeout: float = REPLY_TIMEOUT) -> None:
+    target = len(feed_requests(name)) + times
+    assert wait_until(lambda: len(feed_requests(name)) >= target, timeout), \
+        f"The bot didn't fetch feed {name!r} {times} more time(s)"
