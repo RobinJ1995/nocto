@@ -110,7 +110,7 @@ var serviceFactory = function(context, serviceName) {
     return false;
 };
 
-var bot = new TgBot(_.extend(config.get('api'), {
+var bot = new TgBot(_.extend({}, config.get('api'), {
     logCategory: 'tgbot',
     commandPrefix: config.get('behavior.commandPrefix')
 }));
@@ -120,7 +120,7 @@ var pluginResources = {
     app: appInfo,
     web: web ? web.toPluginResource() : null
 };
-var plugins = new PluginManager(_.extend(config.get('plugins'), {
+var plugins = new PluginManager(_.extend({}, config.get('plugins'), {
     basePath: path.join(__dirname, 'plugins')
 }), pluginResources, serviceFactory);
 plugins.enableLater(config.get('plugins.autoEnabled'));
