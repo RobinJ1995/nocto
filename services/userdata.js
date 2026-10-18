@@ -39,16 +39,11 @@ module.exports.provides = function(context) {
             return getUserData(getRecordByUserName(name));
         },
         owner: function() {
-            var ownerData = null;
-            _.some(_.toPairs(users), function(recordPair) {
-                if (recordPair[1].authorityLevel ===
-                        authorityLevelsBySymbol['~']) {
-                    ownerData = getUserData(recordPair);
-                    return false;
-                }
-                return true;
+            var ownerRecord = _.find(_.toPairs(users), function(recordPair) {
+                return recordPair[1].authorityLevel ===
+                       authorityLevelsBySymbol['~'];
             });
-            return ownerData;
+            return ownerRecord ? getUserData(ownerRecord) : null;
         },
         UserAuthority: UserAuthority,
         authoritySymbols: authoritySymbols,
