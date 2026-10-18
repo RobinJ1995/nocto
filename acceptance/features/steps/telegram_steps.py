@@ -263,6 +263,12 @@ def step_reply_also_contains(context: Context, expected: str) -> None:
     assert expected in actual, f"Expected reply to contain {expected!r}, got {actual!r}"
 
 
+@then(r'the reply does not contain "(?P<unexpected>.*)"')
+def step_reply_does_not_contain(context: Context, unexpected: str) -> None:
+    actual = last_reply(context)["params"].get("text", "")
+    assert unexpected not in actual, f"Expected reply not to contain {unexpected!r}, got {actual!r}"
+
+
 @then(r'the bot reply matches "(?P<pattern>[^"]*)"')
 def step_reply_matches(context: Context, pattern: str) -> None:
     actual = reply_text(context)

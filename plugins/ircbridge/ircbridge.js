@@ -660,7 +660,7 @@ function setUserRelayable(telegramGroup, telegramUser, relayable) {
 function setColor(telegramGroup, telegramUser, color) {
     color = color ? color.toLowerCase() : '';
     var colors = Object.keys(irc.colors.codes).filter(function(color) {
-        return (color !== 'bold' && color !== 'underline');
+        return !_.includes(['bold', 'underline', 'reset'], color);
     });
     if (colors.indexOf(color) === -1) {
         api.sendMessage({
