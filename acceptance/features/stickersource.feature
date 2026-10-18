@@ -6,6 +6,21 @@ Feature: stickersource plugin
         And a group chat with id -2500
         And a user with id 2500 and first name "Tester"
 
+    Scenario: a photo becomes a sticker
+        Given the file "ss-photo" is the image "photo.jpg"
+        When the user sends a photo "ss-photo"
+        Then the bot sends a sticker in WebP format
+
+    Scenario: an image document becomes a sticker
+        Given the file "ss-png" is the image "image.png"
+        When the user sends a document "ss-png" named "image.png" of type "image/png"
+        Then the bot sends a sticker in WebP format
+
+    Scenario: a sticker becomes a PNG document
+        Given the file "ss-sticker" is the image "sticker.webp"
+        When the user sends a sticker "ss-sticker"
+        Then the bot sends the document "sticker.png" in PNG format
+
     Scenario: an image that can't be converted
         Given the file "ss-broken-photo" contains "this is not an image"
         When the user sends a photo "ss-broken-photo"
