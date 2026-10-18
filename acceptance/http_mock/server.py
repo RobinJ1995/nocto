@@ -25,6 +25,8 @@ def complete_search() -> Response:
     log_request(suggest_requests)
     with lock:
         response = suggestions.get(request.args.get("q", ""), {"suggestions": []})
+    if response.get("unreachable"):
+        return Response(status=302, headers={"Location": "http://127.0.0.1:9/"})
     if "status" in response:
         return Response("error", status=response["status"])
     if "body" in response:

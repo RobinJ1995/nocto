@@ -78,6 +78,13 @@ Feature: googlesuggest plugin
     When the user sends "/suggest garbage"
     Then the bot replies "Failed to fetch suggestions"
 
+  Scenario: the service can't be reached
+    Given the suggestion service is unreachable for "offline"
+    When the user sends "/suggest offline"
+    Then the bot replies "Failed to fetch suggestions"
+    When the user sends "/echo still alive"
+    Then the bot replies "still alive"
+
   Scenario: the bot identifies itself
     When the user sends "/suggest whoami"
     Then the suggestion service was asked for "whoami" by a client identifying as "nocto/"

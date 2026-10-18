@@ -17,6 +17,11 @@ def step_suggest_fails(context: Context, status: int, query: str) -> None:
     helpers.set_suggestions(query, status=status)
 
 
+@given('the suggestion service is unreachable for "{query}"')
+def step_suggest_unreachable(context: Context, query: str) -> None:
+    helpers.set_suggestions(query, unreachable=True)
+
+
 @given('the suggestion service answers "{body}" for "{query}"')
 def step_suggest_body(context: Context, body: str, query: str) -> None:
     helpers.set_suggestions(query, body=body)
