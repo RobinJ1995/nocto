@@ -68,7 +68,7 @@ module.exports.init = function(resources, service) {
     };
 
     proxy.on('error', function(err, req, res) {
-        res.status = 502;
+        res.statusCode = 502;
         res.end('Bad Gateway');
         log.error(err);
     });

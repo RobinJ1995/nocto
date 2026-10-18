@@ -11,6 +11,7 @@ import ipaddress
 import json
 import logging
 import os
+import socket
 import ssl
 import threading
 import time
@@ -153,6 +154,10 @@ def download(token: str, file_path: str) -> Response:
     for stored in files.values():
         if stored["file_path"] == file_path:
             stored["downloads"] += 1
+            if stored["drop"]:
+                sock = request.environ["werkzeug.socket"]
+                sock.shutdown(socket.SHUT_RDWR)
+                sock.close()
             return Response(stored["content"], mimetype="application/octet-stream")
     return Response("Not Found", status=404)
 
@@ -201,6 +206,7 @@ def register_file() -> Response:
         "file_id": file_id,
         "file_path": body.get("file_path") or f"documents/{file_id}",
         "content": base64.b64decode(body["content_b64"]),
+        "drop": bool(body.get("drop")),
         "downloads": 0,
     }
     return jsonify({"ok": True})

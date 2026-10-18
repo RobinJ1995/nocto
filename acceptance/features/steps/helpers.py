@@ -129,8 +129,8 @@ def settle(bot: Bot, update_ids: Iterable[int]) -> None:
     time.sleep(NEGATIVE_GRACE)
 
 
-def register_file(file_id: str, content: bytes, file_path: Optional[str] = None) -> None:
-    body = {"file_id": file_id, "content_b64": base64.b64encode(content).decode()}
+def register_file(file_id: str, content: bytes, file_path: Optional[str] = None, drop: bool = False) -> None:
+    body = {"file_id": file_id, "content_b64": base64.b64encode(content).decode(), "drop": drop}
     if file_path:
         body["file_path"] = file_path
     requests.post(f"{TELEGRAM_MOCK_URL}/test/files", json=body, timeout=5).raise_for_status()
