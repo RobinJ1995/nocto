@@ -34,3 +34,25 @@ Feature: timezone plugin
   Scenario: an unknown timezone
     When the user sends "/tz atlantis"
     Then the bot replies "Unknown timezone"
+
+  Scenario Outline: lookups ignore case (<input>)
+    When the user sends "/tz <input>"
+    Then the bot reply matches "<zone>: \d{1,2}:\d{1,2}(am|pm)"
+
+    Examples:
+      | input            | zone             |
+      | Europe/Amsterdam | Europe/Amsterdam |
+      | AMSTERDAM        | Europe/Amsterdam |
+      | Amsterdam        | Europe/Amsterdam |
+      | New_York         | America/New_York |
+      | UTC              | UTC              |
+
+  Scenario Outline: object properties are not timezones (<input>)
+    When the user sends "/tz <input>"
+    Then the bot replies "Unknown timezone"
+
+    Examples:
+      | input          |
+      | constructor    |
+      | __proto__      |
+      | hasOwnProperty |
