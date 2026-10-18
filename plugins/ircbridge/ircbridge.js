@@ -511,7 +511,7 @@ function formatIrcEvent(event, ownUser, options) {
                 return target + ' was kicked from channel ' + event.channel +
                     ' by ' + event.by + ' (reason: "' + event.reason + '")';
             case 'nick':
-                if (event.user === ownUser) {
+                if (event.to === ownUser) {
                     return;
                 }
                 return 'User ' + event.from + ' is now known as ' + event.to +
