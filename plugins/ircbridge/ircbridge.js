@@ -77,6 +77,7 @@ handlers.disable = function(cb) {
     inboundRoutes.length = 0;
     outboundRoutes.length = 0;
     copyRoutes.length = 0;
+    readyServers.length = 0;
     clients = {};
     groupScopeMap = {};
     channelScopeMap = {};
