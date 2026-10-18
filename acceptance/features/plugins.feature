@@ -33,6 +33,7 @@ Feature: plugin control
       | plugin        | state               |
       | echo          | loaded and enabled  |
       | timezone      | loaded and enabled  |
+      | kuroshiro     | loaded and enabled  |
       | cowsay        | loaded and enabled  |
       | googlesuggest | loaded and enabled  |
       | feedannounce  | loaded and enabled  |
