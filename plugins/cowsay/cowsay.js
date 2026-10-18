@@ -68,9 +68,11 @@ handlers.handleInlineQuery = function(message) {
                 type: 'article',
                 id: hash,
                 title: cowLabel,
-                parse_mode: 'Markdown',
-                message_text: output,
-                thumb_url: config.thumbLocation ?
+                input_message_content: {
+                    message_text: output,
+                    parse_mode: 'Markdown'
+                },
+                thumbnail_url: config.thumbLocation ?
                     config.thumbLocation + '/' + cow + config.thumbExt :
                     undefined
             };
