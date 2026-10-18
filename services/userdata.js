@@ -177,8 +177,7 @@ function handleAuthorityCommand(commandUserId, targetSpec, authoritySpec) {
 }
 
 function getRecordById(id) {
-    var record = users[id];
-    return record ? [id, record] : undefined;
+    return _.has(users, id) ? [id, users[id]] : undefined;
 }
 
 function getRecordByUserName(name) {
@@ -223,16 +222,15 @@ function UserAuthority(specification) {
 }
 
 UserAuthority.resolveToLevel = function(specification) {
-    if (authoritySymbols[specification] !== undefined) {
+    if (/^[0-6]$/.test(specification)) {
         return specification;
     }
-    var level = authorityLevelsBySymbol[specification];
-    if (level !== undefined) {
-        return level;
+    if (_.has(authorityLevelsBySymbol, specification)) {
+        return authorityLevelsBySymbol[specification];
     }
-    level = authorityLevelsByName[String(specification).toLowerCase()];
-    if (level !== undefined) {
-        return level;
+    var name = String(specification).toLowerCase();
+    if (_.has(authorityLevelsByName, name)) {
+        return authorityLevelsByName[name];
     }
     return null;
 };
