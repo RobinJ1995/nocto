@@ -8,8 +8,8 @@ var api, config, log, persist, storage, emoji;
 var handlers = {}, clients = {}, groupScopeMap = {}, channelScopeMap = {};
 var inboundRoutes = [], outboundRoutes = [], copyRoutes = [], readyServers = [];
 
-const YES = ['1', 'true', 'on'];
-const NO = ['0', 'false', 'off'];
+const YES = ['1', 'true', 'on', 'yes'];
+const NO = ['0', 'false', 'off', 'no'];
 
 const PREFERENCES_KEY_RELAYABLE = 'relayable';
 const PREFERENCES_KEY_COLOUR = 'colour';
