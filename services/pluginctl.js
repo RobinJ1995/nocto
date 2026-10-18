@@ -49,7 +49,7 @@ module.exports.handleMessage = function(message, meta) {
     }
     var reply = new api.MessageBuilder(message.chat.id)
         .replyIfKeyboard(message.message_id);
-    var operation = command.argumentTokens[0].toLowerCase();
+    var operation = (command.argumentTokens[0] || 'status').toLowerCase();
     var argument = command.argumentTokens.slice(1);
     switch (operation) {
     case 'load':
