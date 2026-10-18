@@ -49,7 +49,7 @@ function Announcer(resources) {
     function checkFeed(feed) {
         return Promise.try(function() {
             if (_.isEmpty(feed.subscriptions)) {
-                feed.lastItemDate = undefined;
+                feed.latestItemDate = undefined;
                 return null;
             }
             return fetchFeed(feed).then(function(result) {

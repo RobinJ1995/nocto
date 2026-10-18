@@ -148,3 +148,17 @@ Feature: feed announcements
         Then the latest request for "fa-etag" carried the header "If-None-Match"
         When the feed "fa-etag" publishes the entry "Changed" linking to "https://example.com/changed"
         Then chat -2700 receives an announcement containing "Changed"
+
+    Scenario: entries published while nobody was subscribed are not dumped on the next subscriber
+        Given a feed "fa-idle" titled "Idle" with an entry "Old"
+        And the owner has registered the feed "fa-idle"
+        When the user sends "/sub fa-idle"
+        Then the bot replies "Subscribed to feed "fa-idle"."
+        When the feed "fa-idle" has been checked
+        And the user sends "/unsub fa-idle"
+        Then the bot replies "Unsubscribed from feed "fa-idle"."
+        When the feed "fa-idle" publishes the entry "While nobody listened" linking to "https://example.com/idle"
+        And 3 seconds pass
+        And the user sends "/sub fa-idle"
+        Then the bot replies "Subscribed to feed "fa-idle"."
+        And the chat receives no announcement after 3 more checks of "fa-idle"
