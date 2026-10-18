@@ -609,7 +609,7 @@ function sendWhoisRequest(telegramGroup, ircChannel, ircUser) {
 
 function setAlias(telegramGroup, telegramUser, alias) {
     // Validation: http://stackoverflow.com/a/5163309/1239690
-    if (alias.length > 30 ||
+    if (!alias || alias.length > 30 ||
         !/^[a-z_\-\[\]\\^{}|`][a-z0-9_\-\[\]\\^{}|`]*$/i.test(alias)) {
         api.sendMessage({
             chat_id: telegramGroup,
