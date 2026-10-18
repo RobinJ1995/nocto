@@ -199,6 +199,16 @@ def step_send_video(context: Context, file_id: str, mime: str) -> None:
     send_text(context, context.user, None, video={"file_id": file_id, "mime_type": mime})
 
 
+@when(r"the user shares the location (?P<latitude>-?[\d.]+), (?P<longitude>-?[\d.]+)")
+def step_send_location(context: Context, latitude: str, longitude: str) -> None:
+    send_text(context, context.user, None, location={"latitude": float(latitude), "longitude": float(longitude)})
+
+
+@when(r'the user shares the contact "(?P<first>[^"]*)" "(?P<last>[^"]*)" with phone number "(?P<phone>[^"]*)"')
+def step_send_contact(context: Context, first: str, last: str, phone: str) -> None:
+    send_text(context, context.user, None, contact={"first_name": first, "last_name": last, "phone_number": phone})
+
+
 @when(r'the user types the inline query "(?P<query>[^"]*)"')
 def step_inline_query(context: Context, query: str) -> None:
     context.cursor = helpers.last_seq(context.bot)
@@ -244,6 +254,12 @@ def step_replies_current_time(context: Context, zone: str) -> None:
 @then(r'the bot reply contains "(?P<expected>.*)"')
 def step_reply_contains(context: Context, expected: str) -> None:
     actual = reply_text(context)
+    assert expected in actual, f"Expected reply to contain {expected!r}, got {actual!r}"
+
+
+@then(r'the reply also contains "(?P<expected>.*)"')
+def step_reply_also_contains(context: Context, expected: str) -> None:
+    actual = last_reply(context)["params"].get("text", "")
     assert expected in actual, f"Expected reply to contain {expected!r}, got {actual!r}"
 
 
@@ -305,6 +321,19 @@ def step_keyboard_flags(context: Context) -> None:
     markup = last_reply(context)["params"].get("reply_markup", {})
     flags = {key: markup.get(key) for key in ("one_time_keyboard", "selective", "resize_keyboard")}
     assert all(flags.values()), f"Unexpected keyboard flags {flags!r}"
+
+
+@then(r'the bot\'s last reply lists "(?P<present>[^"]*)" and "(?P<also>[^"]*)" but not "(?P<absent>[^"]*)"')
+def step_reply_lists(context: Context, present: str, also: str, absent: str) -> None:
+    names = last_reply(context)["params"].get("text", "").partition(": ")[2].split(", ")
+    assert present in names and also in names, f"Expected {present!r} and {also!r} in {names!r}"
+    assert absent not in names, f"Did not expect {absent!r} in {names!r}"
+
+
+@then(r"the bot replies in Markdown")
+def step_markdown(context: Context) -> None:
+    mode = last_reply(context)["params"].get("parse_mode")
+    assert mode == "Markdown", f"Expected Markdown, got {mode!r}"
 
 
 @then(r"the bot reply has no link preview")
