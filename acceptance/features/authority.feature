@@ -90,3 +90,25 @@ Feature: user authority
         Given user 2130 is an administrator
         When user 2130 sends "/authority 1 user"
         Then the bot replies "Your target must not have a higher authority than you do."
+
+    Scenario Outline: object properties are not users (<target>)
+        When the owner sends "/authority <target>"
+        Then the bot replies "I do not know of this user. Make sure it is a valid numerical ID or @username."
+
+        Examples:
+            | target      |
+            | constructor |
+            | __proto__   |
+            | toString    |
+
+    Scenario Outline: object properties are not levels (<level>)
+        Given user 2140 is known to the bot
+        When the owner sends "/authority 2140 <level>"
+        Then the bot replies "Invalid authority specification. Try one of: blacklisted user trusted half-operator operator administrator owner"
+
+        Examples:
+            | level       |
+            | length      |
+            | constructor |
+            | __proto__   |
+            | 7           |
