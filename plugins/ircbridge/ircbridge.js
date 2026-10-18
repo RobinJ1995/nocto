@@ -565,16 +565,16 @@ function formatTelegramEvent(message, options) {
         } else if (config.emojiSkinVariants) {
             text = emoji.applySkinVariants(text);
         }
+        if (config.ircBoldNames) {
+            username = irc.colors.wrap('bold', username);
+        }
+        if (config.ircColoredNames) {
+            const color = getUserPreference(message.from.id, PREFERENCES_KEY_COLOUR);
+            if (color) {
+                username = irc.colors.wrap(color, username);
+            }
+        }
         text.replace("\r", '').split("\n").forEach(function (line) {
-            if (config.ircBoldNames) {
-                username = irc.colors.wrap('bold', username);
-            }
-            if (config.ircColoredNames) {
-                const color = getUserPreference(message.from.id, PREFERENCES_KEY_COLOUR);
-                if (color) {
-                    username = irc.colors.wrap(color, username);
-                }
-            }
             lines.push('<' + username + config.telegramUserSuffix +
                 '> ' + line);
         });

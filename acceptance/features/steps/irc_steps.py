@@ -198,6 +198,15 @@ def step_sees_bold(context: Context, nick: str, name: str, chan: str) -> None:
                      f"{name} in bold in {chan}")
 
 
+@then('"{nick}" sees the bridge write "{name}" in bold on all {count:d} lines in "{chan}"')
+def step_sees_bold_everywhere(context: Context, nick: str, name: str, count: int, chan: str) -> None:
+    watcher = client(context, nick)
+    assert helpers.wait_until(lambda: len(bridge_lines(watcher, chan)) >= count), \
+        f"{nick} saw fewer than {count} lines from the bridge"
+    prefixes = [line.text.partition(">")[0] + ">" for line in bridge_lines(watcher, chan)]
+    assert all(p == f"<\x02{name}\x0f>" for p in prefixes), f"Inconsistent name formatting: {prefixes!r}"
+
+
 @then('"{nick}" sees the bridge write "{name}" in colour {code:d} in "{chan}"')
 def step_sees_colour(context: Context, nick: str, name: str, code: int, chan: str) -> None:
     watcher = client(context, nick)
