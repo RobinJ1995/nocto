@@ -44,8 +44,28 @@ services:
       timeout: 3s
       retries: 30
 
+  ircd:
+    image: ghcr.io/ergochat/ergo:v2.19.1
+    environment:
+      ERGO__FAKELAG__ENABLED: "false"
+      ERGO__SERVER__IP_LIMITS: '{"count": false, "throttle": false}'
+      # bcrypt of "acceptance", so behave can become an IRC operator
+      ERGO__OPERS__ADMIN__PASSWORD: "$$2a$$04$$Fr/ngxu4ov6MowuJwm9wQe//nXBcz11IkVGxXgS/3kmMXBbnHL1Ca"
+    healthcheck:
+      test: ["CMD-SHELL", "printf 'QUIT\\r\\n' | nc -w 2 127.0.0.1 6667 | grep -q ERROR"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
   nocto:
     <<: *bot
+    depends_on:
+      telegram-mock:
+        condition: service_healthy
+      http-mock:
+        condition: service_healthy
+      ircd:
+        condition: service_healthy
     volumes:
       - certs:/certs:ro
       - ./config/main.json:/usr/src/app/config/local.json:ro
@@ -69,10 +89,14 @@ services:
     environment:
       TELEGRAM_MOCK_URL: http://telegram-mock:8081
       HTTP_MOCK_URL: http://http-mock:8090
+      IRC_HOST: ircd
+      IRC_OPER_PASSWORD: acceptance
     depends_on:
       telegram-mock:
         condition: service_healthy
       http-mock:
+        condition: service_healthy
+      ircd:
         condition: service_healthy
       nocto:
         condition: service_started

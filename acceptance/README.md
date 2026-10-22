@@ -15,7 +15,7 @@ docker compose down -v
 The exit code is behave's. To run a single feature against an already running stack:
 
 ```bash
-docker compose up -d --build telegram-mock http-mock nocto nocto-strict nocto-pristine
+docker compose up -d --build telegram-mock http-mock ircd nocto nocto-strict nocto-pristine
 docker compose run --rm --build behave behave features/echo.feature
 ```
 
@@ -28,7 +28,8 @@ rerunning against the same stack can fail where a fresh run passes.
 |------------------|------|
 | `telegram-mock`  | Fake Bot API. Serves the bots over HTTPS on 8443 with a certificate from a CA it writes to the `certs` volume; behave uses plain HTTP on 8081 to inject updates and read recorded calls. |
 | `http-mock`      | Fake third-party HTTP services (Google suggestions), reachable as `suggest.nocto.test`. |
-| `nocto`          | Main bot: plugins enabled, web server and media permalinks on, `/` and `!` prefixes. |
+| `ircd`           | [Ergo](https://ergo.chat) IRC server for the ircbridge plugin. behave connects as plain IRC clients and becomes an operator for kicks, topics and modes. Features tagged `@irc` use it. |
+| `nocto`          | Main bot: plugins enabled, web server and media permalinks on, `/` and `!` prefixes, bridged to `ircd`. |
 | `nocto-strict`   | Strict firewall, throttling, encrypted permalinks. Features tagged `@strict` run against it. |
 | `nocto-pristine` | Never claimed until `ownership.feature` does it. Features tagged `@pristine` run against it. |
 | `behave`         | The test runner. |

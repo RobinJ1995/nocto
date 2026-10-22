@@ -37,6 +37,7 @@ Feature: plugin control
             | cowsay        | loaded and enabled  |
             | googlesuggest | loaded and enabled  |
             | feedannounce  | loaded and enabled  |
+            | ircbridge     | loaded and enabled  |
             | stickersource | loaded but disabled |
             | trace         | loaded but disabled |
 

@@ -15,8 +15,8 @@
     },
     "plugins": {
         "loadAll": false,
-        "register": ["echo", "timezone", "kuroshiro", "cowsay", "googlesuggest", "feedannounce", "stickersource", "trace"],
-        "autoEnabled": ["echo", "timezone", "kuroshiro", "cowsay", "googlesuggest", "feedannounce"],
+        "register": ["echo", "timezone", "kuroshiro", "cowsay", "googlesuggest", "feedannounce", "ircbridge", "stickersource", "trace"],
+        "autoEnabled": ["echo", "timezone", "kuroshiro", "cowsay", "googlesuggest", "feedannounce", "ircbridge"],
         "config": {
             "cowsay": {
                 "blacklist": ["sheep"],
@@ -29,6 +29,49 @@
             "feedannounce": {
                 "interval": 1,
                 "requestTimeout": 3
+            },
+            "ircbridge": {
+                "servers": {
+                    "neta": {
+                        "host": "ircd",
+                        "nick": "nocto",
+                        "options": {
+                            "userName": "nocto",
+                            "realName": "Nocto bridge",
+                            "port": 6667,
+                            "floodProtection": false,
+                            "retryDelay": 1000
+                        },
+                        "autoPerform": [],
+                        "channels": {
+                            "#bridge-one": {"relayFrom": [-4101], "relayTo": [-4101]},
+                            "#bridge-two": {"relayFrom": [-4102], "relayTo": [-4102]},
+                            "#bridge-shared": {"relayTo": [-4103, -4104]},
+                            "#multi-a": {"relayFrom": [-4105], "relayTo": [-4105]},
+                            "#multi-b": {"relayFrom": [-4105], "relayTo": [-4105]},
+                            "#readonly": {"relayTo": [-4106]},
+                            "#copy-src": {
+                                "relayTo": [-4107],
+                                "copyTo": [{"server": "netb", "channel": "#copy-dst"}]
+                            }
+                        }
+                    },
+                    "netb": {
+                        "host": "ircd",
+                        "nick": "noctob",
+                        "options": {
+                            "userName": "noctob",
+                            "realName": "Nocto copy bridge",
+                            "port": 6667,
+                            "floodProtection": false,
+                            "retryDelay": 1000
+                        },
+                        "autoPerform": [],
+                        "channels": {
+                            "#copy-dst": {}
+                        }
+                    }
+                }
             }
         }
     },
