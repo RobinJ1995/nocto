@@ -1,0 +1,85 @@
+name: nocto-acceptance
+
+x-bot: &bot
+  image: nocto-acceptance-bot
+  build:
+    context: ..
+    dockerfile: Dockerfile
+  environment:
+    NODE_EXTRA_CA_CERTS: /certs/ca.pem
+  # Fresh persisted state (owner, authorities, plugin state) on every run.
+  tmpfs:
+    - /usr/src/app/persist:uid=1000,gid=1000
+    - /usr/src/app/logs:uid=1000,gid=1000
+  stop_signal: SIGINT
+  depends_on:
+    telegram-mock:
+      condition: service_healthy
+    http-mock:
+      condition: service_healthy
+
+services:
+  telegram-mock:
+    build:
+      context: ./telegram_mock
+    volumes:
+      - certs:/certs
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/test/health')"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  http-mock:
+    build:
+      context: ./http_mock
+    networks:
+      default:
+        aliases:
+          - suggest.nocto.test
+          - feeds.nocto.test
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8090/test/health')"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  nocto:
+    <<: *bot
+    volumes:
+      - certs:/certs:ro
+      - ./config/main.json:/usr/src/app/config/local.json:ro
+
+  nocto-strict:
+    <<: *bot
+    volumes:
+      - certs:/certs:ro
+      - ./config/strict.json:/usr/src/app/config/local.json:ro
+
+  nocto-pristine:
+    <<: *bot
+    volumes:
+      - certs:/certs:ro
+      - ./config/pristine.json:/usr/src/app/config/local.json:ro
+
+  behave:
+    build:
+      context: .
+      dockerfile: Dockerfile.behave
+    environment:
+      TELEGRAM_MOCK_URL: http://telegram-mock:8081
+      HTTP_MOCK_URL: http://http-mock:8090
+    depends_on:
+      telegram-mock:
+        condition: service_healthy
+      http-mock:
+        condition: service_healthy
+      nocto:
+        condition: service_started
+      nocto-strict:
+        condition: service_started
+      nocto-pristine:
+        condition: service_started
+
+volumes:
+  certs:

@@ -1,0 +1,49 @@
+{
+    "api": {
+        "token": "1001:main",
+        "baseUri": "https://telegram-mock:8443",
+        "pollTimeout": 5,
+        "pollRetry": 1000
+    },
+    "behavior": {
+        "commandPrefix": ["/", "!"]
+    },
+    "web": {
+        "enabled": true,
+        "port": 3000,
+        "baseUri": "http://nocto:3000"
+    },
+    "plugins": {
+        "loadAll": false,
+        "register": ["echo", "timezone", "cowsay", "googlesuggest", "feedannounce", "stickersource", "trace"],
+        "autoEnabled": ["echo", "timezone", "cowsay", "googlesuggest", "feedannounce"],
+        "config": {
+            "cowsay": {
+                "blacklist": ["sheep"],
+                "thumbLocation": "https://cows.nocto.test",
+                "thumbExt": ".png"
+            },
+            "googlesuggest": {
+                "requestUri": "http://suggest.nocto.test:8090/complete/search"
+            },
+            "feedannounce": {
+                "interval": 1,
+                "requestTimeout": 3
+            }
+        }
+    },
+    "services": {
+        "register": [
+            "userdata", "persist", "emoji", "interact", "pluginctl", "firewall",
+            "fileinfocache", "stickercodec", "throttle", "mediaproxy"
+        ]
+    },
+    "log": {
+        "appenders": {
+            "console": {"type": "console", "layout": {"type": "basic"}}
+        },
+        "categories": {
+            "default": {"appenders": ["console"], "level": "INFO"}
+        }
+    }
+}

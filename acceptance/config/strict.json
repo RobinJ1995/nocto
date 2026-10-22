@@ -1,0 +1,60 @@
+{
+    "api": {
+        "token": "1002:strict",
+        "baseUri": "https://telegram-mock:8443",
+        "pollTimeout": 5,
+        "pollRetry": 1000
+    },
+    "web": {
+        "enabled": true,
+        "port": 3000,
+        "baseUri": "http://nocto-strict:3000"
+    },
+    "plugins": {
+        "loadAll": false,
+        "register": ["echo", "cowsay", "feedannounce"],
+        "autoEnabled": ["echo", "cowsay", "feedannounce"],
+        "config": {
+            "cowsay": {
+                "whitelist": ["moose", "default", "tux"]
+            }
+        }
+    },
+    "services": {
+        "register": [
+            "userdata", "persist", "emoji", "interact", "pluginctl", "firewall",
+            "fileinfocache", "stickercodec", "throttle", "mediaproxy"
+        ],
+        "config": {
+            "firewall": {
+                "rules": {
+                    "privateCommand": "known",
+                    "groupCommand": "trusted",
+                    "privateMessage": "user",
+                    "groupMessage": "user"
+                }
+            },
+            "throttle": {
+                "grantImmunity": "half-operator",
+                "burst": 2,
+                "rate": [1, 3],
+                "queueLimit": 1,
+                "warningText": "Slow down, some of your messages are being ignored."
+            },
+            "mediaproxy": {
+                "encryptFileId": true,
+                "privileges": {
+                    "permalink": "trusted"
+                }
+            }
+        }
+    },
+    "log": {
+        "appenders": {
+            "console": {"type": "console", "layout": {"type": "basic"}}
+        },
+        "categories": {
+            "default": {"appenders": ["console"], "level": "INFO"}
+        }
+    }
+}
