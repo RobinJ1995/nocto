@@ -16,6 +16,7 @@ BRIDGE = re.compile(r"^nocto\d*$")
 RELAY_TO = {
     "#bridge-one": [-4101], "#bridge-two": [-4102], "#bridge-shared": [-4103, -4104],
     "#multi-a": [-4105], "#multi-b": [-4105], "#readonly": [-4106], "#copy-src": [-4107],
+    "#renames": [-4108],
 }
 
 
@@ -128,6 +129,15 @@ def step_kick(context: Context, nick: str, chan: str, reason: str) -> None:
 def step_mode(context: Context, mode: str, chan: str) -> None:
     irc_event(context)
     context.chanop.send(f"MODE {chan} {mode}")
+
+
+@when('an IRC operator renames "{nick}" to "{new_nick}"')
+def step_sanick(context: Context, nick: str, new_nick: str) -> None:
+    irc_event(context)
+    since = context.chanop.mark()
+    context.chanop.send(f"SANICK {nick} {new_nick}")
+    context.chanop.wait_for(lambda l: l.command == "NICK" and l.nick == nick and l.text == new_nick,
+                            f"{nick} become {new_nick}", since)
 
 
 # ---------------------------------------------------------------------------
