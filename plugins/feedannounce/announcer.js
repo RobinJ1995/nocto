@@ -109,8 +109,8 @@ function Announcer(resources) {
             };
             if (feed.eTag) {
                 customHeaders['If-None-Match'] = feed.eTag;
-            } else if (feed.lastModifed) {
-                customHeaders['If-Modified-Since'] = feed.lastModifed;
+            } else if (feed.lastModified) {
+                customHeaders['If-Modified-Since'] = feed.lastModified;
             }
             var reqOptions = {
                 method: 'GET',

@@ -162,3 +162,14 @@ Feature: feed announcements
         And the user sends "/sub fa-idle"
         Then the bot replies "Subscribed to feed "fa-idle"."
         And the chat receives no announcement after 3 more checks of "fa-idle"
+
+    Scenario: feeds with a Last-Modified date are fetched conditionally
+        Given a feed "fa-dated" titled "Dated" with an entry "Old"
+        And the feed "fa-dated" uses Last-Modified dates
+        And the owner has registered the feed "fa-dated"
+        When the user sends "/sub fa-dated"
+        Then the bot replies "Subscribed to feed "fa-dated"."
+        When the feed "fa-dated" has been checked 2 more times
+        Then the latest request for "fa-dated" carried the header "If-Modified-Since"
+        When the feed "fa-dated" publishes the entry "Fresh" linking to "https://example.com/fresh"
+        Then chat -2700 receives an announcement containing "Fresh"
