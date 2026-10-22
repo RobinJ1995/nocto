@@ -1,0 +1,27 @@
+name: lint
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: RobinJ1995/robinlint@master
+        with:
+          rules: |
+            editorconfig: only-new
+            braces: only-new
+            braces-placement: only-new
+            elseif: only-new
+            no-else-after-exit: only-new
+            function-reference: false
+            no-single-parameter-brackets: only-new
+            no-ads-in-prs: only-new
+            no-ads-in-commits: only-new
+            no-tools-as-commit-author: only-new
+            no-ads-in-branch-names: only-new
