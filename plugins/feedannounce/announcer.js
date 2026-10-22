@@ -22,7 +22,7 @@ function Announcer(resources) {
         currentIndex = 0;
         feeds = feedContainer;
         labels = _(feedUtil.getFeedArray(feeds))
-            .filter({ enabled: true }).map('label');
+            .filter({ enabled: true }).map('label').value();
         if (labels.length) {
             var interval = config.interval * 1000 / labels.length;
             timer = setInterval(function() {
