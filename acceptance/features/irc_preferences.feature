@@ -91,6 +91,18 @@ Feature: IRC preferences
         When the user sends "/setrelay"
         Then the bot replies "Your messages are currently being relayed to #multi-a, #multi-b."
 
+    Scenario Outline: answering yes or no (<value>)
+        Given a user with id <user> and first name "Tester"
+        When the user sends "/setrelay <value>"
+        Then the bot replies "<reply>"
+
+        Examples:
+            | value | user | reply                                         |
+            | yes   | 4515 | Your messages will be relayed to #bridge-one. |
+            | Yes   | 4516 | Your messages will be relayed to #bridge-one. |
+            | no    | 4517 | Your messages will NOT be relayed.            |
+            | NO    | 4518 | Your messages will NOT be relayed.            |
+
     Scenario: an answer that is neither yes nor no
         Given a user with id 4511 and first name "Tester"
         When the user sends "/setrelay maybe"
