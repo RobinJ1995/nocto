@@ -35,6 +35,12 @@ Feature: IRC preferences
         When the user sends "/setcolor"
         Then the bot reply contains "Available colors: "
         And the reply also contains "light_red"
+        And the reply does not contain "reset"
+
+    Scenario: reset is not a colour
+        Given a user with id 4519 and first name "Tester"
+        When the user sends "/setcolor reset"
+        Then the bot reply contains "Available colors: "
 
     Scenario: an unknown colour lists the available ones
         Given a user with id 4504 and first name "Tester"
