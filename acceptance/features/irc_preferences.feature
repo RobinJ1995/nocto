@@ -71,9 +71,20 @@ Feature: IRC preferences
         When the user sends "/setrelay off"
         Then the bot replies "Your messages will NOT be relayed."
         When the user sends "/setrelay on"
-        Then the bot reply contains "Your messages will be relayed to "
+        Then the bot replies "Your messages will be relayed to #bridge-one."
         When the user sends "I'm back"
         Then "dave4" sees the bridge say "<fickle> I'm back" in "#bridge-one"
+
+    Scenario: checking whether you're relayed
+        Given a user with id 4512 and first name "Tester"
+        When the user sends "/setrelay"
+        Then the bot replies "Your messages are currently being relayed to #bridge-one."
+
+    Scenario: a group bridged to two channels is relayed to both
+        Given a group chat with id -4105
+        And a user with id 4513 and first name "Tester"
+        When the user sends "/setrelay"
+        Then the bot replies "Your messages are currently being relayed to #multi-a, #multi-b."
 
     Scenario: an answer that is neither yes nor no
         Given a user with id 4511 and first name "Tester"

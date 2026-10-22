@@ -696,7 +696,7 @@ function findClientForChannel(channel, telegramGroup) {
 }
 
 function findChannelsForGroup(telegramGroup) {
-    return _.map(_.filter(inboundRoutes, 'to', telegramGroup), 'from');
+    return _.map(_.filter(inboundRoutes, {to: telegramGroup}), 'from');
 }
 
 function isInChannel(channel, channels) {
