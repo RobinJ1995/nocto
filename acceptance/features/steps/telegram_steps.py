@@ -372,7 +372,7 @@ def step_inline_unique_ids(context: Context) -> None:
 @then(r'every inline result shows the cow saying "(?P<text>[^"]*)" in a Markdown code block')
 def step_inline_cow_says(context: Context, text: str) -> None:
     for result in inline_results(context):
-        content = result.get("input_message_content") or result
+        content = result.get("input_message_content", {})
         body = content.get("message_text", "")
         assert content.get("parse_mode") == "Markdown", f"{result.get('title')} is not Markdown"
         assert body.startswith("```\n") and body.endswith("\n```"), f"Not a code block: {body!r}"
@@ -383,5 +383,5 @@ def step_inline_cow_says(context: Context, text: str) -> None:
 def step_inline_thumbnail(context: Context, title: str, url: str) -> None:
     result = next((r for r in inline_results(context) if r.get("title") == title), None)
     assert result, f"No inline result titled {title!r}"
-    actual = result.get("thumbnail_url") or result.get("thumb_url")
+    actual = result.get("thumbnail_url")
     assert actual == url, f"Expected thumbnail {url!r}, got {actual!r}"
