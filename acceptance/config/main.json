@@ -15,8 +15,8 @@
     },
     "plugins": {
         "loadAll": false,
-        "register": ["echo", "timezone", "cowsay", "googlesuggest", "feedannounce", "stickersource", "trace"],
-        "autoEnabled": ["echo", "timezone", "cowsay", "googlesuggest", "feedannounce"],
+        "register": ["echo", "timezone", "kuroshiro", "cowsay", "googlesuggest", "feedannounce", "stickersource", "trace"],
+        "autoEnabled": ["echo", "timezone", "kuroshiro", "cowsay", "googlesuggest", "feedannounce"],
         "config": {
             "cowsay": {
                 "blacklist": ["sheep"],

@@ -1,3 +1,4 @@
+var path = require ('path');
 var Promise = require ('bluebird');
 var Kuroshiro = require ('kuroshiro');
 
@@ -15,12 +16,15 @@ module.exports = (resources) =>
 
 handlers.enable = (cb) =>
 {
+    // kuroshiro's own lookup cuts the path at the first "src", which breaks under /usr/src
+    var dicPath = path.join (path.dirname (require.resolve ('kuromoji/package.json')), 'dict') + path.sep;
 	Kuroshiro.init
 	(
+        {dicPath: dicPath},
 		(error) =>
 		{
 			if (error)
-				cb (error);
+                return cb (error);
 			
 			return Promise.resolve ().asCallback (cb);
 		}
